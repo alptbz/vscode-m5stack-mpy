@@ -20,7 +20,7 @@ class SerialManager {
   }
 
   exec(com: string, code: string): Promise<Buffer> {
-    return this.m5[com].sendCommand(COMMAND_CODES.exec, code);
+    return this.m5[com].sendCommand(COMMAND_CODES.exec, code, true);
   }
 
   listDir(com: string, dirname: string): Promise<Buffer> {

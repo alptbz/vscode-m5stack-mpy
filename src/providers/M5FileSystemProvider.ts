@@ -74,12 +74,20 @@ class M5FileSystemProvider implements vscode.FileSystemProvider {
         async (progress) => {
           progress.report({ increment: 0 });
 
+          var doneyet = false;
+          setTimeout(() => {
+            if(!doneyet) {
+              progress.report({ increment: 100 });
+            }
+          }, 3000);
+
           let r = await SerialManager.bulkDownload(port, filepath, text, false, () => {
             progress.report({ increment });
           });
 
           if (r.toString().indexOf('done') >= 0) {
             progress.report({ increment: 100 });
+            doneyet = true;
           }
 
           return 1;

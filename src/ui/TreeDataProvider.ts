@@ -102,31 +102,40 @@ export class M5TreeDataProvider implements vscode.TreeDataProvider<M5FSResource>
       }
 
       try {
-        const dir = (await SerialManager.listDir(com, extraPath)).toString();
-        dir.split(',').forEach((dir) => {
-          if (!dir) {
-            return [];
-          }
-          const isFile = dir.indexOf('.') > -1;
-          const collapsibleState = isFile
-            ? vscode.TreeItemCollapsibleState.None
-            : vscode.TreeItemCollapsibleState.Collapsed;
-          const node = new M5FSResource(dir, '', extraPath, com, isFile ? FILE : FOLDER, collapsibleState);
-          // file open command
-          if (isFile) {
-            node.command = {
-              command: 'extension.openSelection',
-              title: 'readFile',
-              arguments: [com, `${extraPath}/${dir}`],
-            };
-          }
-          tree.push(node);
+        const timeoutPromise =  new Promise((resolve, reject) => {
+            setTimeout(() => {
+              console.log("listdir timeout reached (10s)");
+              resolve(undefined);
+            }, 10000);
         });
+        const dirRaw : any = await Promise.race([SerialManager.listDir(com, extraPath), timeoutPromise]);
+        if(dirRaw !== undefined) {
+          const dir : string = dirRaw.toString();
+          dir.split(',').forEach((dir) => {
+            if (!dir) {
+              return [];
+            }
+            const isFile = dir.indexOf('.') > -1;
+            const collapsibleState = isFile
+              ? vscode.TreeItemCollapsibleState.None
+              : vscode.TreeItemCollapsibleState.Collapsed;
+            const node = new M5FSResource(dir, '', extraPath, com, isFile ? FILE : FOLDER, collapsibleState);
+            // file open command
+            if (isFile) {
+              node.command = {
+                command: 'extension.openSelection',
+                title: 'readFile',
+                arguments: [com, `${extraPath}/${dir}`],
+              };
+            }
+            tree.push(node);
+          });
+        }
+        
       } catch (e: any) {
         vscode.window.showErrorMessage(e);
       }
     }
-
     return tree;
   }
 

@@ -45,11 +45,11 @@ class SerialConnection {
     return this.isBusy;
   }
 
-  sendCommand(code: number, data: string): Promise<Buffer> {
-    return this.sendCommandWithBuffer(Crc.createDataBuffer(code, data));
+  sendCommand(code: number, data: string, clearOutput: boolean = false): Promise<Buffer> {
+    return this.sendCommandWithBuffer(Crc.createDataBuffer(code, data), clearOutput);
   }
 
-  sendCommandWithBuffer(buffer: Buffer): Promise<Buffer> {
+  sendCommandWithBuffer(buffer: Buffer, clearOutput: boolean = false): Promise<Buffer> {
     this.received = Buffer.from([]);
     const self = this;
     return new Promise((resolve, reject) => {
@@ -57,6 +57,9 @@ class SerialConnection {
       self.resolve = resolve;
       self.reject = reject;
       self.write(Crc.coverCrc(buffer));
+      if(clearOutput) {
+        setTimeout(() => {SerialConnection.outputchannel.clear();}, 100);
+      }
     });
   }
 
@@ -85,16 +88,21 @@ class SerialConnection {
     //   return;
     // }
 
-    SerialConnection.outputchannel.append(chunk.toString());
+    let isCommand = false;
 
     if (Crc.checkReceiveCompleted(this.received)) {
       if (this.received[4] === 0x00) {
         const buf = this.received.slice(5, -5);
         this.resolve(buf);
+        isCommand = true;
       } else {
         this.reject(comErroMessage);
       }
       this.isBusy = false;
+    }
+
+    if(!isCommand) {
+      SerialConnection.outputchannel.append(chunk.toString());
     }
   }
 
