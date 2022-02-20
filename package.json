@@ -2,16 +2,16 @@
 	"name": "vscode-m5stack-mpy",
 	"displayName": "vscode-m5stack-mpy",
 	"description": "A extension for M5Stack Micropython system.",
-	"publisher": "curdeveryday",
+	"publisher": "alptbz",
 	"repository": {
-		"url": "https://github.com/curdeveryday/vscode-m5stack-mpy.git",
+		"url": "https://github.com/alptbz/vscode-m5stack-mpy.git",
 		"type": "git"
 	},
 	"keywords": [
 		"m5stack",
 		"mpy"
 	],
-	"version": "1.1.4",
+	"version": "1.1.5",
 	"engines": {
 		"vscode": "^1.48.0"
 	},
@@ -177,7 +177,7 @@
 		"ts-node": "^10.4.0",
 		"typescript": "^4.4.4",
 		"webpack": "^5.52.1",
-		"webpack-cli": "^4.8.0"
+		"webpack-cli": "^4.9.2"
 	},
 	"dependencies": {
 		"serialport": "10.0.1"
