@@ -1,5 +1,7 @@
-import SerialPort from 'serialport';
+import SerialPort = require("serialport");
 import Crc from './Crc';
+import vscode from 'vscode';
+import { OutputChannel } from 'vscode';
 import { defaultOpts } from './types';
 
 const comErroMessage = 'Communication error, sorry.';
@@ -12,6 +14,8 @@ class SerialConnection {
   public reject: (value: any) => void;
   private onOpenCb: (err: unknown) => void;
   private received: Buffer;
+  private static outputchannel: OutputChannel;
+
   constructor(com: string, onOpenCb: (err: unknown) => void) {
     this.com = com;
     this.port = new SerialPort(com, defaultOpts);
@@ -22,6 +26,10 @@ class SerialConnection {
     this.resolve = () => {};
     this.reject = () => {};
     this.onOpenCb = onOpenCb;
+    if(SerialConnection.outputchannel === undefined) {
+      SerialConnection.outputchannel = vscode.window.createOutputChannel("M5StackSerial");
+      SerialConnection.outputchannel.appendLine("Ready");
+    }
   }
 
   static getCOMs(): Promise<SerialPort.PortInfo[]> {
@@ -56,7 +64,7 @@ class SerialConnection {
     try {
       this.isBusy = true;
       this.port.write(data);
-      this.port.drain((err) => {
+      this.port.drain((err: any) => {
         if (err) {
           this.reject('drain error');
           console.log('drain error', err);
@@ -76,6 +84,8 @@ class SerialConnection {
     //   this.reject(comErroMessage);
     //   return;
     // }
+
+    SerialConnection.outputchannel.append(chunk.toString());
 
     if (Crc.checkReceiveCompleted(this.received)) {
       if (this.received[4] === 0x00) {
