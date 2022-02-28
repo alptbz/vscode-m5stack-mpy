@@ -57,9 +57,9 @@ class SerialConnection {
       self.resolve = resolve;
       self.reject = reject;
       self.write(Crc.coverCrc(buffer));
-      if(clearOutput) {
+      /*if(clearOutput) {
         setTimeout(() => {SerialConnection.outputchannel.clear();}, 100);
-      }
+      }*/
     });
   }
 
