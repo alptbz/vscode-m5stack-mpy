@@ -61,4 +61,17 @@ code ./
 ```
 
 Then you hit F5 and verify that it works.
-See more on https://code.visualstudio.com/api
+See more on https://code.visualstudio.com/a
+
+## Build
+
+```
+cd vscode-m5stack-mpy
+code .
+```
+
+## Package
+
+```
+vsce package
+```
